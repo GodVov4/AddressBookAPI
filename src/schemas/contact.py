@@ -1,3 +1,5 @@
+from typing import Optional
+
 from datetime import date
 from pydantic import BaseModel, EmailStr, Field, PastDate
 
@@ -8,7 +10,7 @@ class ContactSchema(BaseModel):
     email: EmailStr = Field(min_length=6, max_length=50)
     number: str = Field(min_length=9, max_length=20)
     birthday: date = Field(PastDate())
-    description: str = Field(min_length=3, max_length=250)
+    description: Optional[str] = Field(min_length=3, max_length=250)
 
 
 class ContactResponse(BaseModel):
