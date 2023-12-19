@@ -13,8 +13,14 @@ async def create_contact(body: ContactSchema, db: AsyncSession):
     return contact
 
 
-async def get_contacts(limit: int, offset: int, db: AsyncSession):
+async def get_contacts(name: str, surname: str, email: str, limit: int, offset: int, db: AsyncSession):
     stmt = select(Contact).offset(offset).limit(limit)
+    if name:
+        stmt = stmt.filter(Contact.name.like(f'%{name}%'))
+    if surname:
+        stmt = stmt.filter(Contact.surname.like(f'%{surname}%'))
+    if email:
+        stmt = stmt.filter(Contact.email.like(f'%{email}%'))
     contacts = await db.execute(stmt)
     return contacts.scalars().all()
 

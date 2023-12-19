@@ -15,9 +15,13 @@ async def create_contact(body: ContactSchema, db: AsyncSession =  Depends(get_db
 
 
 @router.get('/', response_model=list[ContactResponse])
-async def get_contacts(limit: int = Query(10, ge=10, le=500), offset: int = Query(0, ge=0),
+async def get_contacts(name: str = Query(None, min_length=1, max_length=50),
+                       surname: str = Query(None, min_length=1, max_length=50),
+                       email: str = Query(None, min_length=1, max_length=50),
+                       limit: int = Query(10, ge=10, le=500),
+                       offset: int = Query(0, ge=0),
                        db: AsyncSession = Depends(get_db)):
-    contacts = await repo_book.get_contacts(limit, offset, db)
+    contacts = await repo_book.get_contacts(name, surname, email, limit, offset, db)
     return contacts
 
 
