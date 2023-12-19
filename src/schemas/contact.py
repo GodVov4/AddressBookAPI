@@ -19,7 +19,7 @@ class ContactResponse(BaseModel):
     surname: str
     email: str
     number: str
-    birthday: str
+    birthday: date
     description: str
 
     class Config:
