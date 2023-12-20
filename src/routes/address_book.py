@@ -9,19 +9,20 @@ router = APIRouter(prefix='/address_book', tags=['address_book'])
 
 
 @router.post('/', response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
-async def create_contact(body: ContactSchema, db: AsyncSession =  Depends(get_db)):
+async def create_contact(body: ContactSchema, db: AsyncSession = Depends(get_db)):
     contact = await repo_book.create_contact(body, db)
     return contact
 
 
 @router.get('/', response_model=list[ContactResponse])
-async def get_contacts(name: str = Query(None, min_length=1, max_length=50),
-                       surname: str = Query(None, min_length=1, max_length=50),
-                       email: str = Query(None, min_length=1, max_length=50),
+async def get_contacts(name: str = Query(None, min_length=1, max_length=50),  # filter by name
+                       surname: str = Query(None, min_length=1, max_length=50),  # filter by surname
+                       email: str = Query(None, min_length=1, max_length=50),  # filter by email
+                       birthdays: bool = Query(False),  # show next 7 days birthdays
                        limit: int = Query(10, ge=10, le=500),
                        offset: int = Query(0, ge=0),
                        db: AsyncSession = Depends(get_db)):
-    contacts = await repo_book.get_contacts(name, surname, email, limit, offset, db)
+    contacts = await repo_book.get_contacts(name, surname, email, birthdays, limit, offset, db)
     return contacts
 
 

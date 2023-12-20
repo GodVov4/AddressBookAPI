@@ -1,4 +1,6 @@
-from sqlalchemy import select
+import datetime
+
+from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entity.models import Contact
@@ -13,7 +15,7 @@ async def create_contact(body: ContactSchema, db: AsyncSession):
     return contact
 
 
-async def get_contacts(name: str, surname: str, email: str, limit: int, offset: int, db: AsyncSession):
+async def get_contacts(name: str, surname: str, email: str, birthdays: bool, limit: int, offset: int, db: AsyncSession):
     stmt = select(Contact).offset(offset).limit(limit)
     if name:
         stmt = stmt.filter(Contact.name.like(f'%{name}%'))
@@ -21,6 +23,11 @@ async def get_contacts(name: str, surname: str, email: str, limit: int, offset: 
         stmt = stmt.filter(Contact.surname.like(f'%{surname}%'))
     if email:
         stmt = stmt.filter(Contact.email.like(f'%{email}%'))
+    if birthdays:
+        current_date = datetime.date.today()
+        today = current_date.strftime('%m-%d')
+        seven_days = (current_date + datetime.timedelta(7)).strftime('%m-%d')
+        stmt = stmt.filter(func.to_char(Contact.birthday, 'MM-DD').between(today, seven_days))  # Thanks "AusAura"
     contacts = await db.execute(stmt)
     return contacts.scalars().all()
 
