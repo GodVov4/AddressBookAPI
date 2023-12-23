@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entity.models import Contact, User
