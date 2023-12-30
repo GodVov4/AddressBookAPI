@@ -1,18 +1,17 @@
-from datetime import datetime, timedelta
 from pathlib import Path
-from fastapi import HTTPException, status
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from fastapi_mail.errors import ConnectionErrors
-from jose import jwt, JWTError
 from pydantic import EmailStr
+
+from src.conf.config import config
 
 
 conf = ConnectionConfig(
-    MAIL_USERNAME="martin.volodya@meta.ua",
-    MAIL_PASSWORD="Dzidzio1234",
-    MAIL_FROM="martin.volodya@meta.ua",
-    MAIL_PORT=465,
-    MAIL_SERVER="smtp.meta.ua",
+    MAIL_USERNAME=config.MAIL_USERNAME,
+    MAIL_PASSWORD=config.MAIL_PASSWORD,
+    MAIL_FROM=config.MAIL_FROM,
+    MAIL_PORT=config.MAIL_PORT,
+    MAIL_SERVER=config.MAIL_SERVER,
     MAIL_FROM_NAME="Volodymyr",
     MAIL_STARTTLS=False,
     MAIL_SSL_TLS=True,
@@ -20,17 +19,6 @@ conf = ConnectionConfig(
     VALIDATE_CERTS=True,
     TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
 )
-
-
-async def get_email_from_token(token: str, secret_key: str, algorithm: str):
-    try:
-        payload = jwt.decode(token, secret_key, [algorithm])
-        email = payload["sub"]
-        return email
-    except JWTError as e:
-        print(e)
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="Invalid token for email verification")
 
 
 async def send_email(email: EmailStr, username: str, token: str, host: str):

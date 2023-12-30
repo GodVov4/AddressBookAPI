@@ -6,19 +6,16 @@ from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin, schemas, m
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users.exceptions import UserAlreadyExists
-from fastapi_users.jwt import generate_jwt
 from libgravatar import Gravatar
 
+from src.conf.config import config
 from src.database.fu_db import User, get_user_db
 from src.services.email import send_email
 
-SECRET_KEY = '974790aec4ac460bdc11645decad4dce7c139b7f2982b7428ec44e886ea588c6'  # TODO прибрать в ENV файл
-ALGORITHM = 'HS256'
-
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
-    reset_password_token_secret = SECRET_KEY
-    verification_token_secret = SECRET_KEY
+    reset_password_token_secret = config.SECRET_KEY_JWT
+    verification_token_secret = config.SECRET_KEY_JWT
 
     def __init__(self, user_db: SQLAlchemyUserDatabase, background_tasks: BackgroundTasks):
         super().__init__(user_db)
@@ -58,7 +55,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
     async def on_after_verify(self, user: models.UP, request: Optional[Request] = None) -> None:
         print('verified user', user.email)
-º
+
 
 async def get_user_manager(background_tasks: BackgroundTasks, user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
     yield UserManager(user_db, background_tasks)
@@ -68,7 +65,7 @@ bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET_KEY, lifetime_seconds=3600)
+    return JWTStrategy(secret=config.SECRET_KEY_JWT, lifetime_seconds=3600)
 
 
 auth_backend = AuthenticationBackend(
