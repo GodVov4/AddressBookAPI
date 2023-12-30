@@ -1,19 +1,19 @@
 """Init
 
-Revision ID: cea8683f81c8
+Revision ID: fdf90b167394
 Revises: 
-Create Date: 2023-12-23 16:42:40.591892
+Create Date: 2023-12-29 16:13:58.516858
 
 """
-from typing import Sequence, Union
-
 import fastapi_users_db_sqlalchemy
-from alembic import op
 import sqlalchemy as sa
+
+from typing import Sequence, Union
+from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'cea8683f81c8'
+revision: str = 'fdf90b167394'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,7 +27,6 @@ def upgrade() -> None:
     sa.Column('refresh_token', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('role', sa.Enum('admin', 'moderator', 'user', name='role'), nullable=True),
     sa.Column('id', fastapi_users_db_sqlalchemy.generics.GUID(), nullable=False),
     sa.Column('email', sa.String(length=320), nullable=False),
     sa.Column('hashed_password', sa.String(length=1024), nullable=False),

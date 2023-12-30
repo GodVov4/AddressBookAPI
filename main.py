@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,6 +7,8 @@ from src.database.fu_db import get_db
 from src.routes import address_book, auth
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 app.include_router(auth.router)
 app.include_router(address_book.router, prefix="/api")

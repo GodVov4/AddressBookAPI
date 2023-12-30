@@ -2,16 +2,13 @@ from fastapi import APIRouter, HTTPException, Depends, status, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.fu_db import get_db
-from src.entity.models import User, Role
+from src.entity.models import User
 from src.repository import address_book as repo_book
 from src.schemas.contact import ContactSchema, ContactResponse
 from src.services.auth import current_active_user
-from src.services.roles import RoleAccess
 
 router = APIRouter(prefix='/address_book', tags=['address_book'])
 
-# Add roles
-# access_to_route_all = RoleAccess([Role.admin, Role.user])
 
 
 @router.post('/', response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
