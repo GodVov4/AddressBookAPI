@@ -7,15 +7,24 @@ from fastapi_users.authentication import AuthenticationBackend, BearerTransport,
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users.exceptions import UserAlreadyExists
 from libgravatar import Gravatar
+from pickle import dumps, loads
+from redis.asyncio import Redis
+from starlette.responses import Response
 
 from src.conf.config import config
 from src.database.fu_db import User, get_user_db
-from src.services.email import send_email
+from src.services.email import send_email_verification, send_email_forgot_password
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = config.SECRET_KEY_JWT
     verification_token_secret = config.SECRET_KEY_JWT
+    cache = Redis(
+        host=config.REDIS_DOMAIN,
+        port=config.REDIS_PORT,
+        db=0,
+        password=config.REDIS_PASSWORD,
+    )
 
     def __init__(self, user_db: SQLAlchemyUserDatabase, background_tasks: BackgroundTasks):
         super().__init__(user_db)
@@ -46,9 +55,26 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         await self.on_after_register(created_user, request)
         return created_user
 
+    async def on_after_login(
+        self,
+        user: models.UP,
+        request: Optional[Request] = None,
+        response: Optional[Response] = None,
+    ) -> None:
+        user_hash = str(user.email)
+        cached_user = await self.cache.get(user_hash)
+
+        if cached_user is None:
+            cached_user = await self.get_by_email(user.email)
+            await self.cache.set(user_hash, dumps(cached_user))
+            await self.cache.expire(user_hash, 300)
+        else:
+            cached_user = loads(cached_user)
+        return cached_user
+
     async def on_after_request_verify(self, user: User, token: str, request: Optional[Request] = None):
         host = str(request.base_url)
-        self.background_tasks.add_task(send_email, user.email, user.username, token, host)
+        self.background_tasks.add_task(send_email_verification, user.email, user.username, token, host)
 
     async def on_after_verify(self, user: models.UP, request: Optional[Request] = None) -> None:
         print('verified user', user.email)
@@ -59,10 +85,11 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         update_dict: Dict[str, Any],
         request: Optional[Request] = None,
     ) -> None:
-        print('updated user', user.email)
+        await self.on_after_login(user)
 
     async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None):
-        print(f"User {user.id} has forgot their password. Reset token: {token}")
+        host = str(request.base_url)
+        self.background_tasks.add_task(send_email_forgot_password, user.email, user.username, token, host)
 
 
 async def get_user_manager(background_tasks: BackgroundTasks, user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):

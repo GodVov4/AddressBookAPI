@@ -1,10 +1,9 @@
-import redis.asyncio as redis
-
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi_limiter import FastAPILimiter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,7 +33,7 @@ app.include_router(address_book.router, prefix="/api")
 
 @app.on_event("startup")
 async def startup():
-    r = await redis.Redis(
+    r = await Redis(
         host=config.REDIS_DOMAIN,
         port=config.REDIS_PORT,
         db=0,

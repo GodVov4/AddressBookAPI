@@ -21,7 +21,7 @@ conf = ConnectionConfig(
 )
 
 
-async def send_email(email: EmailStr, username: str, token: str, host: str):
+async def send_email_verification(email: EmailStr, username: str, token: str, host: str):
     try:
         message = MessageSchema(
             subject="Confirm your email",
@@ -32,5 +32,20 @@ async def send_email(email: EmailStr, username: str, token: str, host: str):
 
         fm = FastMail(conf)
         await fm.send_message(message, template_name="verify_email.html")
+    except ConnectionErrors as err:
+        print(err)
+
+
+async def send_email_forgot_password(email: EmailStr, username: str, token: str, host: str):
+    try:
+        message = MessageSchema(
+            subject="Forgot password",
+            recipients=[email],
+            template_body={"host": host, "username": username, "token": token},
+            subtype=MessageType.html
+        )
+
+        fm = FastMail(conf)
+        await fm.send_message(message, template_name="forgot_password.html")
     except ConnectionErrors as err:
         print(err)
