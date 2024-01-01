@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 0000
     REDIS_PASSWORD: str | None = None
     CLD_NAME: str = 'abc'
-    CLD_API_KEY: int = 326488457974591
+    CLD_API_KEY: int = 000000000000000
     CLD_API_SECRET: str = "secret"
 
 

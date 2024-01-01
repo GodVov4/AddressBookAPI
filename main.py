@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.conf.config import config
 from src.database.fu_db import get_db
-from src.routes import address_book, auth
+from src.routes import address_book, auth, users
 
 app = FastAPI()
 
@@ -28,6 +28,7 @@ BASE_DIR = Path('.')
 app.mount("/static", StaticFiles(directory=BASE_DIR / "src" / "static"), name="static")
 
 app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(address_book.router, prefix="/api")
 
 

@@ -22,7 +22,6 @@ conf = ConnectionConfig(
 
 
 async def send_email(email: EmailStr, username: str, token: str, host: str):
-    print(email, username, token, host)
     try:
         message = MessageSchema(
             subject="Confirm your email",

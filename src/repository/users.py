@@ -18,7 +18,9 @@ async def update_token(user: User, token: str | None, db: AsyncSession):
     await db.commit()
 
 
-async def confirmed_email(email: str, db: AsyncSession):
+async def update_avatar_url(email: str, url: str | None, db: AsyncSession):
     user = await get_user_by_email(email, db)
-    user.confirmed = True
+    user.avatar = url
     await db.commit()
+    await db.refresh(user)
+    return user

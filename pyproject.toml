@@ -21,6 +21,8 @@ fastapi-users = {extras = ["sqlalchemy"], version = "12.1.2"}
 fastapi-mail = "1.4.1"
 fastapi-limiter = "0.1.5"
 redis = "4.6.0"
+python-dotenv = "1.0.0"
+cloudinary = "1.37.0"
 
 
 [build-system]

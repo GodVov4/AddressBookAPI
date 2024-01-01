@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import FileResponse
 
 from src.database.fu_db import get_db
-from src.schemas.user import UserCreate, UserRead, UserUpdate
+from src.schemas.user import UserCreate, UserRead
 from src.services.auth import auth_backend, fastapi_users, get_user_manager
 
 router = APIRouter()
@@ -30,11 +30,6 @@ router.include_router(
     fastapi_users.get_verify_router(UserRead),
     prefix="/auth",
     tags=["auth"],
-)
-router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate, requires_verification=True),
-    prefix="/users",
-    tags=["users"],
 )
 
 

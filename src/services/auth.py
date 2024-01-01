@@ -1,6 +1,6 @@
 import uuid
 
-from typing import Optional
+from typing import Optional, Dict, Any
 from fastapi import Depends, Request, BackgroundTasks
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin, schemas, models
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
@@ -46,15 +46,23 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         await self.on_after_register(created_user, request)
         return created_user
 
-    async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None):
-        print(f"User {user.id} has forgot their password. Reset token: {token}")
-
     async def on_after_request_verify(self, user: User, token: str, request: Optional[Request] = None):
         host = str(request.base_url)
         self.background_tasks.add_task(send_email, user.email, user.username, token, host)
 
     async def on_after_verify(self, user: models.UP, request: Optional[Request] = None) -> None:
         print('verified user', user.email)
+
+    async def on_after_update(
+        self,
+        user: models.UP,
+        update_dict: Dict[str, Any],
+        request: Optional[Request] = None,
+    ) -> None:
+        print('updated user', user.email)
+
+    async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None):
+        print(f"User {user.id} has forgot their password. Reset token: {token}")
 
 
 async def get_user_manager(background_tasks: BackgroundTasks, user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
