@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     SECRET_KEY_JWT: str = "secret_jwt"
     MAIL_USERNAME: EmailStr = "postgres@email.com"
     MAIL_PASSWORD: str = "password"
-    MAIL_FROM: str = "username"
+    MAIL_FROM: str = "username@email.com"
     MAIL_PORT: int = 000
     MAIL_SERVER: str = "email_server"
     REDIS_DOMAIN: str = 'localhost'

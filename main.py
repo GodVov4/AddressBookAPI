@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = Path('.')
+BASE_DIR = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "src" / "static"), name="static")
 
 app.include_router(auth.router)
@@ -33,6 +33,12 @@ app.include_router(address_book.router, prefix="/api")
 
 @app.on_event("startup")
 async def startup():
+    """
+    Initializes the application when it starts up.
+
+    This function is called automatically when the application starts up.
+    It connects to the Redis server using the configuration provided and initializes the FastAPILimiter.
+    """
     r = await Redis(
         host=config.REDIS_DOMAIN,
         port=config.REDIS_PORT,
@@ -44,6 +50,17 @@ async def startup():
 
 @app.get("/api/healthchecker")
 async def healthchecker(db: AsyncSession = Depends(get_db)):
+    """
+    A function that checks the health of the API.
+
+    :param db: An instance of the AsyncSession class used to interact with the database.
+    :type db: AsyncSession
+
+    :return: A dictionary containing a welcome message if the health check is successful.
+    :rtype: dict
+
+    :raises HTTPException: If there is an error connecting to the database or if the database is not configured correctly.
+    """
     try:
         # Make request
         result = await db.execute(text("SELECT 1"))
