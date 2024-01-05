@@ -1,7 +1,7 @@
 from typing import Optional
 
 from datetime import date
-from pydantic import BaseModel, EmailStr, Field, PastDate
+from pydantic import BaseModel, EmailStr, Field, PastDate, ConfigDict
 
 
 class ContactSchema(BaseModel):
@@ -22,5 +22,4 @@ class ContactResponse(BaseModel):
     birthday: date
     description: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

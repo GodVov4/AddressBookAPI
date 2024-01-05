@@ -21,7 +21,7 @@ config(
 )
 
 router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate, requires_verification=False),
+    fastapi_users.get_users_router(UserRead, UserUpdate, requires_verification=True),
     prefix="/users",
     tags=["users"],
 )

@@ -28,17 +28,17 @@ async def create_contact(body: ContactSchema, db: AsyncSession, user: User):
     return contact
 
 
-async def get_contacts(name: str, surname: str, email: str, birthdays: bool, limit: int, offset: int, db: AsyncSession,
-                       user: User):
+async def get_contacts(name: str | None, surname: str | None, email: str | None, birthdays: bool, limit: int,
+                       offset: int, db: AsyncSession, user: User):
     """
     Retrieves contacts based on the given search criteria.
 
     :param name: The name to search for in the contacts.
-    :type name: str
+    :type name: str or None
     :param surname: The surname to search for in the contacts.
-    :type surname: str
+    :type surname: str or None
     :param email: The email to search for in the contacts.
-    :type email: str
+    :type email: str or None
     :param birthdays: Specifies if contacts with upcoming birthdays should be included.
     :type birthdays: bool
     :param limit: The maximum number of contacts to retrieve.

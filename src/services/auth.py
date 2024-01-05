@@ -175,7 +175,8 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         self.background_tasks.add_task(send_email_forgot_password, user.email, user.username, token, host)
 
 
-async def get_user_manager(background_tasks: BackgroundTasks, user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
+async def get_user_manager(background_tasks: BackgroundTasks = None,
+                           user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
     """
     An asynchronous function that returns a user manager.
 
